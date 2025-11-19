@@ -417,6 +417,12 @@
     </footer>
 
     <script>
+        // Force the page to start at the top on load/refresh
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        window.scrollTo(0, 0);
+
         let currentUnit = 'cm';
 
         function setUnit(unit) {
