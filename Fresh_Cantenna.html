@@ -245,10 +245,16 @@
                             <button type="button" onclick="setUnit('mm')" id="btn-mm" class="px-3 py-1 text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition">mm</button>
                         </div>
                     </div>
-                    <input type="number" id="canDiameter" placeholder="e.g. 8.5" class="w-full p-3 rounded-lg text-lg font-mono shadow-inner" step="0.1" oninput="calculateDimensions()">
+                    <!-- Removed oninput="calculateDimensions()" -->
+                    <input type="number" id="canDiameter" placeholder="e.g. 8.5" class="w-full p-3 rounded-lg text-lg font-mono shadow-inner mb-3" step="0.1" min="0">
+                    
+                    <button onclick="calculateDimensions()" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-sky-500/20 mb-3">
+                        Calculate Results
+                    </button>
+
                     <div class="flex justify-between items-center mt-2">
                         <p class="text-xs text-slate-500" id="rangeHelper">
-                            <i class="fas fa-info-circle"></i> Ideal range: 8.0cm - 9.2cm
+                            <i class="fas fa-info-circle"></i> Ideal: 8.0cm - 9.2cm <span class="mx-1 text-slate-600">|</span> Allowed: 7.21cm - 9.42cm
                         </p>
                         <button onclick="resetCalculator()" class="text-xs text-slate-500 hover:text-sky-400 transition flex items-center gap-1" title="Reset to defaults">
                             <i class="fas fa-rotate-left"></i> Reset
@@ -260,7 +266,7 @@
                     <!-- Dynamic Results go here -->
                     <div class="text-center text-slate-500 h-full flex flex-col justify-center">
                         <i class="fas fa-arrow-left text-2xl mb-2 md:hidden"></i>
-                        <p>Enter diameter to calculate</p>
+                        <p>Enter diameter and press Calculate</p>
                     </div>
                 </div>
             </div>
@@ -438,18 +444,15 @@
                 btnCm.className = "px-3 py-1 text-xs font-bold bg-sky-500 text-white transition";
                 btnMm.className = "px-3 py-1 text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition";
                 input.placeholder = "e.g. 8.5";
-                helper.innerHTML = '<i class="fas fa-info-circle"></i> Ideal range: 8.0cm - 9.2cm';
+                helper.innerHTML = '<i class="fas fa-info-circle"></i> Ideal: 8.0cm - 9.2cm <span class="mx-1 text-slate-600">|</span> Allowed: 7.21cm - 9.42cm';
             } else {
                 btnMm.className = "px-3 py-1 text-xs font-bold bg-sky-500 text-white transition";
                 btnCm.className = "px-3 py-1 text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition";
                 input.placeholder = "e.g. 85";
-                helper.innerHTML = '<i class="fas fa-info-circle"></i> Ideal range: 80mm - 92mm';
+                helper.innerHTML = '<i class="fas fa-info-circle"></i> Ideal: 80mm - 92mm <span class="mx-1 text-slate-600">|</span> Allowed: 72.1mm - 94.2mm';
             }
-
-            // Trigger recalculation if a value exists
-            if (input.value) {
-                calculateDimensions();
-            }
+            
+            // Note: We no longer trigger calculation automatically here
         }
 
         function resetCalculator() {
@@ -463,7 +466,7 @@
             document.getElementById('resultsPanel').innerHTML = `
                 <div class="text-center text-slate-500 h-full flex flex-col justify-center">
                     <i class="fas fa-arrow-left text-2xl mb-2 md:hidden"></i>
-                    <p>Enter diameter to calculate</p>
+                    <p>Enter diameter and press Calculate</p>
                 </div>`;
         }
 
@@ -472,10 +475,12 @@
             const resultsPanel = document.getElementById('resultsPanel');
             let val = parseFloat(input.value);
 
-            if (!val || isNaN(val)) {
+            // Validation: Check for empty, NaN, or non-positive numbers
+            if (!val || isNaN(val) || val <= 0) {
                 resultsPanel.innerHTML = `
                     <div class="text-center text-slate-500 h-full flex flex-col justify-center">
-                        <p>Enter diameter to calculate</p>
+                        <i class="fas fa-arrow-left text-2xl mb-2 md:hidden"></i>
+                        <p>Enter diameter and press Calculate</p>
                     </div>`;
                 return;
             }
@@ -488,62 +493,79 @@
             const c = 299792458000; // Speed of light in mm/s
             const lambda_0 = c / f; // Free space wavelength in mm (~123mm)
 
-            // Cutoff Calculations
-            const cut_TE11 = lambda_0 / 1.706; // Lower limit
-            const cut_TM01 = lambda_0 / 1.306; // Upper limit
+            // Cutoff Limits
+            const cut_TE11 = lambda_0 / 1.706; // Lower limit (~72.1mm)
+            const cut_TM01 = lambda_0 / 1.306; // Upper limit (~94.2mm)
 
-            let statusHTML = '';
-            let isViable = false;
+            // STRICT BOUNDARY CHECK
+            // If out of bounds, STOP and show RED ALERT.
+            if (D_mm < cut_TE11 || D_mm > cut_TM01) {
+                let errorTitle = "";
+                let errorMsg = "";
+                let boundaryVal = "";
 
-            if (D_mm < cut_TE11) {
-                statusHTML = `<div class="text-red-400 font-bold mb-2"><i class="fas fa-times-circle"></i> Too Small</div>
-                <p class="text-sm text-slate-400">This diameter acts as a high-pass filter blocking 2.4GHz. The wave cannot enter the can.</p>`;
-            } else if (D_mm > cut_TM01) {
-                statusHTML = `<div class="text-orange-400 font-bold mb-2"><i class="fas fa-exclamation-triangle"></i> Too Large</div>
-                <p class="text-sm text-slate-400">This diameter allows multi-mode propagation (TE11 + TM01). It will work, but efficiency and directionality will be unpredictable.</p>`;
-                isViable = true; // Technically works, just poorly
-            } else {
-                statusHTML = `<div class="text-green-400 font-bold mb-2"><i class="fas fa-check-circle"></i> Excellent</div>
-                <p class="text-sm text-slate-400">This diameter perfectly supports the dominant mode while suppressing higher modes.</p>`;
-                isViable = true;
-            }
-
-            // Calculations
-            let guideWavelengthVal = "N/A";
-            let probePos = "N/A";
-            let minLength = "N/A";
-            let probeHeight = (lambda_0 / 4).toFixed(2); // Always calc in mm first
-            
-            if (D_mm > cut_TE11) {
-                // Calculate Guide Wavelength
-                const ratio = lambda_0 / (1.706 * D_mm);
-                const lambda_g = lambda_0 / Math.sqrt(1 - Math.pow(ratio, 2));
-                
-                // Store raw mm values
-                let gw_mm = lambda_g;
-                let pp_mm = lambda_g / 4;
-                let ml_mm = lambda_g * 0.75;
-
-                // Format based on unit
-                if (currentUnit === 'cm') {
-                    guideWavelengthVal = (gw_mm / 10).toFixed(2);
-                    probePos = (pp_mm / 10).toFixed(2);
-                    minLength = (ml_mm / 10).toFixed(2);
+                if (D_mm < cut_TE11) {
+                    errorTitle = "Diameter Too Small (Cutoff)";
+                    errorMsg = "The wave physically cannot fit inside this can. It acts as a high-pass filter blocking the 2.4 GHz signal completely.";
+                    boundaryVal = `Minimum required: ${(cut_TE11 / (currentUnit === 'cm' ? 10 : 1)).toFixed(2)} ${currentUnit}`;
                 } else {
-                    guideWavelengthVal = gw_mm.toFixed(2);
-                    probePos = pp_mm.toFixed(2);
-                    minLength = ml_mm.toFixed(2);
+                    errorTitle = "Diameter Too Large (Multimode)";
+                    errorMsg = "This diameter allows multiple signal modes (TE11 + TM01) to bounce chaotically, causing destructive interference and signal loss. It is forbidden for a reliable link.";
+                    boundaryVal = `Maximum allowed: ${(cut_TM01 / (currentUnit === 'cm' ? 10 : 1)).toFixed(2)} ${currentUnit}`;
                 }
+
+                resultsPanel.innerHTML = `
+                    <div class="bg-red-500/10 border-2 border-red-500 rounded-xl p-6 h-full flex flex-col justify-center items-center text-center">
+                        <div class="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center mb-4">
+                            <i class="fas fa-ban text-3xl"></i>
+                        </div>
+                        <h4 class="text-xl font-bold text-red-400 mb-2 uppercase tracking-wide">Forbidden Dimensions</h4>
+                        <p class="text-white font-semibold text-lg mb-2">${errorTitle}</p>
+                        <p class="text-slate-300 text-sm mb-6 max-w-sm mx-auto">${errorMsg}</p>
+                        <div class="bg-red-900/50 px-4 py-2 rounded border border-red-500/50">
+                            <span class="font-mono text-red-200 font-bold">${boundaryVal}</span>
+                        </div>
+                    </div>
+                `;
+                return; // STOP EXECUTION HERE
             }
 
-            // Format Probe Height based on unit
+            // --- Only proceed if valid --- 
+
+            // Calculate Guide Wavelength
+            const ratio = lambda_0 / (1.706 * D_mm);
+            const lambda_g = lambda_0 / Math.sqrt(1 - Math.pow(ratio, 2));
+            
+            // Store raw mm values
+            let gw_mm = lambda_g;
+            let pp_mm = lambda_g / 4;
+            let ml_mm = lambda_g * 0.75;
+            let probeHeight_val = lambda_0 / 4;
+
+            // Variables for display
+            let guideWavelengthVal, probePos, minLength, probeHeight;
+
+            // Format based on unit
             if (currentUnit === 'cm') {
-                probeHeight = (parseFloat(probeHeight) / 10).toFixed(2);
+                guideWavelengthVal = (gw_mm / 10).toFixed(2);
+                probePos = (pp_mm / 10).toFixed(2);
+                minLength = (ml_mm / 10).toFixed(2);
+                probeHeight = (probeHeight_val / 10).toFixed(2);
+            } else {
+                guideWavelengthVal = gw_mm.toFixed(2);
+                probePos = pp_mm.toFixed(2);
+                minLength = ml_mm.toFixed(2);
+                probeHeight = probeHeight_val.toFixed(2);
             }
 
+            // Render Success UI
             resultsPanel.innerHTML = `
                 <div class="border-b border-slate-700 pb-4 mb-4">
-                    ${statusHTML}
+                     <div class="text-green-400 font-bold mb-2 flex items-center gap-2">
+                        <i class="fas fa-check-circle text-xl"></i> 
+                        <span class="text-lg">Design Validated</span>
+                    </div>
+                    <p class="text-sm text-slate-400">This diameter perfectly supports the dominant mode ($TE_{11}$) while blocking interference ($TM_{01}$).</p>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                     <div>
