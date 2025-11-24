@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,211 +13,268 @@
                 displayMath: [['$$', '$$'], ['\\[', '\\]']]
             },
             chtml: {
-                scale: 1.1 // Slightly scale up math fonts
+                scale: 1.1 
             },
             options: {
                 ignoreHtmlClass: 'tex2jax_ignore',
                 processHtmlClass: 'tex2jax_process'
             }
         };
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        }
+                    }
+                }
+            }
+        }
     </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
+            background-color: #0b1121;
             color: #e2e8f0;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.1) 0px, transparent 50%);
+            background-attachment: fixed;
         }
         .font-mono {
             font-family: 'JetBrains Mono', monospace;
         }
+        
+        /* Glassmorphism Cards */
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
         .math-block {
             overflow-x: auto;
             padding: 1.5rem;
-            background: #1e293b;
-            border-radius: 0.5rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 0.75rem;
             margin: 1.5rem 0;
-            border: 1px solid #334155;
-            font-size: 1.35rem; /* Increased font size for better readability */
+            border: 1px solid rgba(56, 189, 248, 0.1);
+            font-size: 1.35rem;
             color: #e2e8f0;
             display: flex;
             justify-content: center;
+            box-shadow: inset 0 2px 10px rgba(0,0,0,0.3);
+            transition: border-color 0.3s ease;
         }
+        .math-block:hover {
+            border-color: rgba(56, 189, 248, 0.3);
+        }
+
         .diagram-container {
             position: relative;
             width: 100%;
-            height: 340px; /* Increased height for extra label */
-            background: #1e293b;
-            border-radius: 0.5rem;
+            height: 340px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 0.75rem;
             overflow: hidden;
-            border: 1px solid #334155;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
-        .highlight {
-            color: #38bdf8;
-            font-weight: bold;
-        }
-        .warning {
-            color: #fbbf24;
-        }
+
         input[type="number"] {
-            background-color: #334155;
-            border: 1px solid #475569;
+            background-color: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(71, 85, 105, 0.6);
             color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         input[type="number"]:focus {
             outline: none;
             border-color: #38bdf8;
-            ring: 2px solid #38bdf8;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.2);
+            background-color: rgba(30, 41, 59, 0.8);
         }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; 
+        }
+
+        /* Animation Utilities */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+        .delay-300 { animation-delay: 300ms; }
+        .delay-400 { animation-delay: 400ms; }
     </style>
 </head>
 <body class="antialiased min-h-screen flex flex-col">
 
     <!-- Navigation / Header -->
-    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
-            <a href="#" class="flex items-center gap-3 hover:opacity-80 transition">
-                <i class="fas fa-wifi text-sky-400 text-2xl"></i>
-                <h1 class="text-xl font-bold tracking-tight text-white">Cantenna<span class="text-sky-400">Architect</span></h1>
+    <header class="glass-panel sticky top-0 z-50 border-b-0 border-b-slate-800/50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="#" class="flex items-center gap-3 group relative overflow-hidden rounded-xl px-3 py-1 transition-all hover:bg-white/5">
+                <div class="relative">
+                    <i class="fas fa-wifi text-sky-400 text-2xl relative z-10 transition-transform duration-500 group-hover:scale-110 group-hover:rotate-12"></i>
+                    <!-- Animated ripple behind logo -->
+                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-sky-500/30 rounded-full blur-sm opacity-0 group-hover:animate-ping"></div>
+                </div>
+                <h1 class="text-xl font-bold tracking-tight text-white relative z-10">
+                    Cantenna<span class="text-sky-400 transition-all duration-300 group-hover:text-sky-300 group-hover:drop-shadow-[0_0_8px_rgba(56,189,248,0.5)]">Architect</span>
+                </h1>
             </a>
-            <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-400">
-                <a href="#theory" class="hover:text-white transition">Theory</a>
-                <a href="#calculator" class="hover:text-white transition">Calculator</a>
-                <a href="#construction" class="hover:text-white transition">Construction</a>
+            <nav class="hidden md:flex gap-8 text-sm font-medium text-slate-400">
+                <a href="#theory" class="hover:text-sky-400 hover:scale-105 transition-all duration-300">Theory</a>
+                <a href="#calculator" class="hover:text-sky-400 hover:scale-105 transition-all duration-300">Calculator</a>
+                <a href="#construction" class="hover:text-sky-400 hover:scale-105 transition-all duration-300">Construction</a>
             </nav>
         </div>
     </header>
 
     <!-- Hero Section -->
-    <section class="py-12 md:py-20 bg-gradient-to-b from-slate-900 to-slate-800">
-        <div class="max-w-4xl mx-auto px-4 text-center">
-            <h2 class="text-4xl md:text-5xl font-bold text-white mb-6">Designing the Circular Waveguide</h2>
-            <p class="text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto">
-                You have the LMR-400, the N-connector, and the copper. Now you need the math. 
-                This guide bridges the gap between generic internet tutorials and electromagnetic engineering.
+    <section class="relative py-16 md:py-24 overflow-hidden">
+        <!-- Ambient Background Lights -->
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-sky-500/10 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+        
+        <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
+            <span class="inline-block py-1 px-3 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-bold tracking-wider mb-6 animate-fade-in-up">
+                V2.0 &bull; INTERACTIVE GUIDE
+            </span>
+            <h2 class="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight animate-fade-in-up delay-100">
+                Designing the <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-sky-400 to-indigo-400">Circular Waveguide</span>
+            </h2>
+            <p class="text-lg text-slate-300 leading-relaxed max-w-2xl mx-auto mb-10 animate-fade-in-up delay-200">
+                Turn a simple metal can into a high-gain directional Wi-Fi antenna. 
+                Use this engineering-grade calculator to ensure your dimensions match the 2.4 GHz frequency perfectly.
             </p>
-            <div class="mt-8 flex justify-center gap-4">
-                <a href="#calculator" class="bg-sky-500 hover:bg-sky-600 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg shadow-sky-500/20">
-                    Design Your Can
+            <div class="flex flex-col sm:flex-row justify-center gap-4 animate-fade-in-up delay-300">
+                <a href="#calculator" class="group relative px-8 py-3.5 bg-sky-500 hover:bg-sky-400 text-white rounded-xl font-semibold shadow-lg shadow-sky-500/25 transition-all hover:-translate-y-1 active:translate-y-0 overflow-hidden">
+                    <div class="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite]"></div>
+                    <span class="relative flex items-center gap-2">
+                        <i class="fas fa-calculator"></i> Design Your Can
+                    </span>
                 </a>
-                <a href="#construction" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-3 rounded-lg font-semibold transition">
-                    View Build Steps
+                <a href="#construction" class="px-8 py-3.5 bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-slate-600 rounded-xl font-semibold transition-all hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2">
+                    <i class="fas fa-hammer text-slate-400"></i> View Build Steps
                 </a>
             </div>
         </div>
     </section>
 
     <!-- Theory Section -->
-    <section id="theory" class="py-16 max-w-4xl mx-auto px-4">
-        <div class="flex items-center gap-3 mb-8">
-            <div class="bg-sky-500/10 p-3 rounded-full text-sky-400">
-                <i class="fas fa-book-open"></i>
+    <section id="theory" class="py-20 max-w-5xl mx-auto px-4">
+        <div class="flex items-center gap-4 mb-10">
+            <div class="bg-gradient-to-br from-sky-500 to-blue-600 p-3.5 rounded-xl shadow-lg shadow-sky-500/20">
+                <i class="fas fa-book-open text-white text-xl"></i>
             </div>
             <h3 class="text-3xl font-bold text-white">1. The Physics of the Can</h3>
         </div>
 
         <div class="space-y-8 text-slate-300">
-            <div class="bg-slate-800/50 p-6 rounded-xl border border-slate-700">
-                <h4 class="text-xl font-semibold text-white mb-3">It's not an antenna, it's a Feed & Waveguide</h4>
-                <p class="mb-4">
+            <div class="glass-panel p-8 rounded-2xl border-l-4 border-l-sky-500">
+                <h4 class="text-xl font-bold text-white mb-3">It's not an antenna, it's a Feed & Waveguide</h4>
+                <p class="mb-4 leading-relaxed">
                     Your copper wire is the actual antenna (a monopole). The can is a <strong>circular waveguide</strong>. It directs the energy in a single direction. However, radio waves travel differently inside a tube than they do in open air. This is the most critical concept to understand.
                 </p>
-                <p>
+                <p class="leading-relaxed">
                     Inside the can, the wave bounces off the walls. This "bouncing" slows down the phase velocity of the wave. Therefore, the wavelength inside the can ($ \lambda_g $) is <strong>longer</strong> than the wavelength in free space ($ \lambda_0 $).
                 </p>
             </div>
 
-            <div>
-                <h4 class="text-xl font-semibold text-white mb-4">The "Mode" Dilemma</h4>
-                <p class="mb-4">
-                    We want the radio wave to propagate in the dominant mode, known as <strong>TE<sub>11</sub></strong> (Transverse Electric 11). This mode matches the orientation of your single copper probe.
-                </p>
-                <p class="mb-4">
-                    However, if the can is too wide, it allows a secondary mode called <strong>TM<sub>01</sub></strong>. This is bad. It causes interference and signal loss.
-                </p>
-                <ul class="list-disc pl-6 space-y-2 marker:text-sky-400">
-                    <li><strong>Can too small:</strong> The wave cannot enter (Cutoff). Like trying to fit a basketball in a golf hole.</li>
-                    <li><strong>Can too big:</strong> Multiple modes exist (TE<sub>11</sub> + TM<sub>01</sub>). The signal gets "confused" and efficient transmission drops.</li>
-                    <li><strong>Sweet Spot:</strong> We need a diameter where TE<sub>11</sub> passes, but TM<sub>01</sub> is blocked.</li>
-                </ul>
+            <div class="grid md:grid-cols-5 gap-8 items-center">
+                <div class="md:col-span-3">
+                    <h4 class="text-xl font-bold text-white mb-4">The "Mode" Dilemma</h4>
+                    <p class="mb-4">
+                        We want the radio wave to propagate in the dominant mode, known as <strong>TE<sub>11</sub></strong> (Transverse Electric 11). This mode matches the orientation of your single copper probe.
+                    </p>
+                    <p class="mb-4">
+                        However, if the can is too wide, it allows a secondary mode called <strong>TM<sub>01</sub></strong>. This causes interference.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-times-circle text-red-400 mt-1"></i>
+                            <span><strong>Can too small:</strong> The wave cannot enter (Cutoff).</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-exclamation-triangle text-orange-400 mt-1"></i>
+                            <span><strong>Can too big:</strong> Multiple modes (TE<sub>11</sub> + TM<sub>01</sub>) cause signal chaos.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-green-400 mt-1"></i>
+                            <span><strong>Sweet Spot:</strong> TE<sub>11</sub> passes, TM<sub>01</sub> is blocked.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="md:col-span-2 bg-black/20 p-6 rounded-2xl border border-white/5 flex flex-col items-center justify-center text-center">
+                    <i class="fas fa-wave-square text-5xl text-sky-500/50 mb-4 animate-pulse-slow"></i>
+                    <p class="text-sm text-slate-400 italic">"We need the can to filter out the bad modes and guide the good one."</p>
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Formulas Section -->
-    <section class="py-16 bg-slate-800/30 border-y border-slate-800">
-        <div class="max-w-4xl mx-auto px-4">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="bg-purple-500/10 p-3 rounded-full text-purple-400">
-                    <i class="fas fa-square-root-variable"></i>
+    <section class="py-20 bg-slate-900/50 border-y border-white/5 relative">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="bg-gradient-to-br from-purple-500 to-fuchsia-600 p-3.5 rounded-xl shadow-lg shadow-purple-500/20">
+                    <i class="fas fa-square-root-variable text-white text-xl"></i>
                 </div>
                 <h3 class="text-3xl font-bold text-white">2. The Governing Formulas</h3>
             </div>
 
-            <div class="grid gap-8">
-                <!-- Step 1: Free Space -->
-                <div>
-                    <h4 class="text-lg font-semibold text-sky-300">A. Free Space Wavelength ($\lambda_0$)</h4>
-                    <p class="text-slate-400 text-sm mb-2">The length of the wave in open air.</p>
-                    <div class="math-block">
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Step 1 -->
+                <div class="glass-panel p-6 rounded-2xl hover:border-sky-500/30 transition-colors">
+                    <h4 class="text-lg font-bold text-sky-300 mb-2">A. Free Space Wavelength ($\lambda_0$)</h4>
+                    <p class="text-slate-400 text-sm mb-4">The length of the wave in open air.</p>
+                    <div class="math-block !m-0 !py-4">
                         $$ \lambda_0 = \frac{c}{f} $$
                     </div>
-                    <p class="text-slate-400 text-sm">Where $c$ is the speed of light ($299,792,458$ m/s) and $f$ is frequency (2.437 GHz).</p>
                 </div>
 
-                <!-- Step 2: Cutoff -->
-                <div>
-                    <h4 class="text-lg font-semibold text-sky-300">B. Cutoff Conditions (Selecting Diameter $D$)</h4>
-                    <p class="text-slate-400 text-sm mb-2">To act as a proper waveguide, the diameter $D$ must satisfy:</p>
-                    <div class="math-block">
+                <!-- Step 2 -->
+                <div class="glass-panel p-6 rounded-2xl hover:border-sky-500/30 transition-colors">
+                    <h4 class="text-lg font-bold text-sky-300 mb-2">B. Cutoff Conditions</h4>
+                    <p class="text-slate-400 text-sm mb-4">Selecting the correct diameter $D$.</p>
+                    <div class="math-block !m-0 !py-4">
                         $$ \frac{\lambda_0}{1.706} < D < \frac{\lambda_0}{1.306} $$
                     </div>
-                    <p class="text-slate-400 text-sm">
-                        Lower Limit ($TE_{11}$ cutoff): $\approx 72$ mm.<br>
-                        Upper Limit ($TM_{01}$ cutoff): $\approx 94$ mm.
-                    </p>
                 </div>
 
-                <!-- Step 3: Guide Wavelength -->
-                <div>
-                    <h4 class="text-lg font-semibold text-sky-300">C. Guide Wavelength ($\lambda_g$)</h4>
-                    <p class="text-slate-400 text-sm mb-2">The length of the wave <strong>inside</strong> the can. This is the number we build with.</p>
-                    <div class="math-block">
+                <!-- Step 3 -->
+                <div class="md:col-span-2 glass-panel p-6 rounded-2xl hover:border-sky-500/30 transition-colors">
+                    <h4 class="text-lg font-bold text-sky-300 mb-2">C. Guide Wavelength ($\lambda_g$)</h4>
+                    <p class="text-slate-400 text-sm mb-4">The expanded wavelength inside the tube. This is the number we build with.</p>
+                    <div class="math-block !m-0 !py-6 !bg-slate-900/50">
                         $$ \lambda_g = \frac{\lambda_0}{\sqrt{1 - \left( \frac{\lambda_0}{1.706 D} \right)^2}} $$
-                    </div>
-                </div>
-
-                <!-- Step 4: Dimensions -->
-                <div>
-                    <h4 class="text-lg font-semibold text-sky-300">D. Construction Dimensions</h4>
-                    <p class="text-slate-300 mb-4 text-sm">
-                        The total length of the can is crucial. We need $\frac{1}{4}\lambda_g$ behind the probe for reflection, and at least $\frac{1}{2}\lambda_g$ in front of it for the wave to launch.
-                    </p>
-                    <div class="grid md:grid-cols-3 gap-4 mt-4">
-                        <div class="bg-slate-800 p-4 rounded border border-slate-700">
-                            <span class="block text-sm text-slate-400">Probe Location (S)</span>
-                            <div class="py-2 flex justify-center">
-                                <span class="text-2xl text-white">$$ S = \frac{\lambda_g}{4} $$</span>
-                            </div>
-                            <p class="text-xs text-slate-500 mt-2">Back wall to copper wire.</p>
-                        </div>
-                        <div class="bg-slate-800 p-4 rounded border border-slate-700">
-                            <span class="block text-sm text-slate-400">Probe Height (L)</span>
-                            <div class="py-2 flex justify-center">
-                                <span class="text-2xl text-white">$$ L = \frac{\lambda_0}{4} $$</span>
-                            </div>
-                            <p class="text-xs text-slate-500 mt-2">Copper wire length.</p>
-                        </div>
-                        <div class="bg-slate-800 p-4 rounded border border-slate-700 border-l-4 border-l-sky-500">
-                            <span class="block text-sm text-slate-400">Min. Can Length</span>
-                            <div class="py-2 flex justify-center">
-                                <span class="text-2xl text-white">$$ \approx 0.75 \lambda_g $$</span>
-                            </div>
-                            <p class="text-xs text-slate-500 mt-2">Minimum total tube length.</p>
-                        </div>
                     </div>
                 </div>
             </div>
@@ -225,136 +282,174 @@
     </section>
 
     <!-- Calculator Section -->
-    <section id="calculator" class="py-16 max-w-4xl mx-auto px-4">
-        <div class="bg-slate-800 rounded-2xl p-6 md:p-10 border border-slate-700 shadow-2xl">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-2xl font-bold text-white"><i class="fas fa-calculator text-green-400 mr-2"></i> Can Calculator</h3>
-                <span class="text-xs font-mono bg-slate-900 px-2 py-1 rounded text-slate-400">Freq: 2.437 GHz (Ch 6)</span>
+    <section id="calculator" class="py-24 max-w-5xl mx-auto px-4">
+        <div class="glass-panel rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden ring-1 ring-white/10">
+            <!-- Background Orbs -->
+            <div class="absolute -top-32 -right-32 w-80 h-80 bg-sky-500/10 rounded-full blur-[80px] pointer-events-none animate-pulse-slow"></div>
+            <div class="absolute -bottom-32 -left-32 w-80 h-80 bg-purple-500/10 rounded-full blur-[80px] pointer-events-none animate-pulse-slow" style="animation-delay: 1.5s"></div>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 relative z-10">
+                <h3 class="text-3xl font-bold text-white flex items-center gap-3">
+                    <i class="fas fa-calculator text-sky-400"></i> Can Calculator
+                </h3>
+                <span class="mt-2 md:mt-0 text-xs font-mono bg-slate-900/80 px-4 py-2 rounded-full border border-slate-700 text-sky-400 shadow-inner flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                    Freq: 2.437 GHz (Ch 6)
+                </span>
             </div>
 
-            <p class="text-slate-300 mb-6">
-                Measure the <span class="text-sky-400 font-bold">inner diameter</span> of your can. Enter it below to see if it is suitable and get your drilling measurements.
+            <p class="text-slate-300 mb-10 relative z-10 max-w-2xl">
+                Measure the <span class="text-sky-400 font-bold border-b border-sky-500/50">inner diameter</span> of your can. Enter it below to generate your custom drilling template.
             </p>
 
-            <div class="flex flex-col md:flex-row gap-6 items-start">
-                <div class="w-full md:w-1/3">
-                    <div class="flex justify-between items-center mb-2">
-                        <label class="block text-sm font-medium text-slate-400">Inner Diameter</label>
-                        <div class="flex bg-slate-900 rounded border border-slate-700 overflow-hidden">
-                            <button type="button" onclick="setUnit('cm')" id="btn-cm" class="px-3 py-1 text-xs font-bold bg-sky-500 text-white transition">cm</button>
-                            <button type="button" onclick="setUnit('mm')" id="btn-mm" class="px-3 py-1 text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition">mm</button>
+            <div class="flex flex-col lg:flex-row gap-10 items-start relative z-10">
+                <!-- Input Column -->
+                <div class="w-full lg:w-1/3 space-y-6">
+                    <div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-700/50">
+                        <div class="flex justify-between items-center mb-4">
+                            <label class="block text-sm font-semibold text-slate-300 uppercase tracking-wide">Inner Diameter</label>
+                            <!-- Enhanced Unit Toggle -->
+                            <div class="flex bg-slate-950 p-1.5 rounded-lg border border-slate-800 shadow-inner">
+                                <button type="button" onclick="setUnit('cm')" id="btn-cm" class="px-4 py-1.5 text-xs font-bold rounded-md transition-all">cm</button>
+                                <button type="button" onclick="setUnit('mm')" id="btn-mm" class="px-4 py-1.5 text-xs font-bold rounded-md transition-all">mm</button>
+                            </div>
+                        </div>
+                        
+                        <div class="relative group">
+                            <input type="number" id="canDiameter" placeholder="e.g. 8.5" class="w-full p-4 rounded-xl text-xl font-mono shadow-sm group-hover:border-slate-500 transition-colors" step="0.1" min="0">
+                            <div class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 pointer-events-none text-sm font-bold" id="unit-label">cm</div>
                         </div>
                     </div>
-                    <!-- Removed oninput="calculateDimensions()" -->
-                    <input type="number" id="canDiameter" placeholder="e.g. 8.5" class="w-full p-3 rounded-lg text-lg font-mono shadow-inner mb-3" step="0.1" min="0">
                     
-                    <button onclick="calculateDimensions()" class="w-full bg-sky-500 hover:bg-sky-600 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-sky-500/20 mb-3">
-                        Calculate Results
+                    <!-- Enhanced Calculate Button -->
+                    <button onclick="triggerCalculation()" id="calcBtn" class="w-full bg-gradient-to-r from-sky-500 to-blue-600 hover:from-sky-400 hover:to-blue-500 text-white font-bold py-4 rounded-xl transition-all shadow-lg shadow-sky-500/25 hover:shadow-sky-400/40 hover:-translate-y-1 active:translate-y-0 active:scale-95 flex items-center justify-center gap-3 group">
+                        <i class="fas fa-bolt group-hover:animate-wiggle"></i> Calculate Results
                     </button>
 
-                    <div class="flex justify-between items-center mt-2">
-                        <p class="text-xs text-slate-500" id="rangeHelper">
-                            <i class="fas fa-info-circle"></i> Ideal: 8.0cm - 9.2cm <span class="mx-1 text-slate-600">|</span> Allowed: 7.21cm - 9.42cm
-                        </p>
-                        <button onclick="resetCalculator()" class="text-xs text-slate-500 hover:text-sky-400 transition flex items-center gap-1" title="Reset to defaults">
+                    <div class="flex justify-between items-start gap-4 pt-4 border-t border-slate-700/30">
+                        <div class="text-xs text-slate-400 leading-relaxed" id="rangeHelper">
+                            <i class="fas fa-info-circle text-sky-400 mr-1"></i> 
+                            Ideal: <span class="text-slate-300">8.0-9.2cm</span> 
+                            <br>
+                            Allowed: <span class="text-slate-300">7.21-9.42cm</span>
+                        </div>
+                        <button onclick="resetCalculator()" class="text-xs font-medium text-slate-400 hover:text-white py-2 px-3 rounded-lg hover:bg-slate-800 transition-colors flex items-center gap-2">
                             <i class="fas fa-rotate-left"></i> Reset
                         </button>
                     </div>
                 </div>
 
-                <div class="w-full md:w-2/3 bg-slate-900 rounded-xl p-6 border border-slate-700" id="resultsPanel">
-                    <!-- Dynamic Results go here -->
-                    <div class="text-center text-slate-500 h-full flex flex-col justify-center">
-                        <i class="fas fa-arrow-left text-2xl mb-2 md:hidden"></i>
-                        <p>Enter diameter and press Calculate</p>
+                <!-- Results Column -->
+                <div class="w-full lg:w-2/3 bg-slate-900/80 backdrop-blur-md rounded-2xl p-8 border border-slate-700/80 shadow-inner min-h-[360px] flex flex-col justify-center relative overflow-hidden" id="resultsPanel">
+                    
+                    <!-- Placeholder State -->
+                    <div id="initialState" class="text-center text-slate-500">
+                        <div class="w-20 h-20 bg-slate-800 rounded-full mx-auto mb-6 flex items-center justify-center border border-slate-700">
+                            <i class="fas fa-arrow-left text-3xl opacity-50 hidden lg:block"></i>
+                            <i class="fas fa-arrow-up text-3xl opacity-50 lg:hidden"></i>
+                        </div>
+                        <p class="text-lg font-medium mb-1 text-slate-400">Ready to Design</p>
+                        <p class="text-sm">Enter your can's dimensions to begin.</p>
                     </div>
+
+                    <!-- Loader State (Hidden by default) -->
+                    <div id="loaderState" class="hidden absolute inset-0 bg-slate-900/90 z-20 flex-col items-center justify-center">
+                        <div class="w-12 h-12 border-4 border-sky-500/30 border-t-sky-500 rounded-full animate-spin mb-4"></div>
+                        <p class="text-sky-400 font-mono text-sm animate-pulse">Computing Maxwell's Equations...</p>
+                    </div>
+
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Step by Step Construction -->
-    <section id="construction" class="py-16 max-w-4xl mx-auto px-4">
-        <div class="flex items-center gap-3 mb-10">
-            <div class="bg-orange-500/10 p-3 rounded-full text-orange-400">
-                <i class="fas fa-tools"></i>
+    <section id="construction" class="py-20 max-w-5xl mx-auto px-4">
+        <div class="flex items-center gap-4 mb-12">
+            <div class="bg-gradient-to-br from-orange-500 to-red-600 p-3.5 rounded-xl shadow-lg shadow-orange-500/20">
+                <i class="fas fa-tools text-white text-xl"></i>
             </div>
             <h3 class="text-3xl font-bold text-white">3. Construction Guide</h3>
         </div>
 
-        <div class="space-y-12">
+        <div class="space-y-16">
             
             <!-- Step 1 -->
-            <div class="relative pl-8 border-l-2 border-slate-700">
-                <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-sky-500"></div>
-                <h4 class="text-xl font-bold text-white mb-2">Step 1: Can Selection & Cleaning</h4>
-                <p class="text-slate-300 mb-4">
+            <div class="relative pl-10 md:pl-16 border-l-2 border-slate-800 hover:border-sky-500/50 transition-colors duration-500">
+                <div class="absolute -left-[11px] top-0 w-6 h-6 rounded-full bg-slate-900 border-4 border-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]"></div>
+                <h4 class="text-2xl font-bold text-white mb-4">Step 1: Can Selection & Cleaning</h4>
+                <p class="text-slate-300 mb-6 text-lg leading-relaxed">
                     Based on the calculator above, select a straight-walled metal can. 
-                    <span class="text-sky-300">Coffee cans, stew cans, or paint thinner cans</span> usually fall in the 85-100mm range.
-                    Avoid ribbed cans (corrugation ruins the wave pattern).
+                    <span class="text-sky-300 font-semibold">Coffee cans, stew cans, or paint thinner cans</span> usually fall in the 85-100mm range.
                 </p>
-                <div class="bg-yellow-500/10 border-l-4 border-yellow-500 p-4 text-yellow-200 text-sm">
-                    <strong>Common Myth:</strong> Pringles cans (approx 75mm) are actually suboptimal. They operate barely above the cutoff frequency, leading to high signal attenuation. A metal coffee can (~100mm) or formula tin is physically superior.
+                <div class="glass-panel p-5 rounded-r-xl border-l-4 border-l-yellow-500 flex gap-4 items-start">
+                    <i class="fas fa-lightbulb text-yellow-500 text-xl mt-1"></i>
+                    <div>
+                        <strong class="text-yellow-200 block mb-1">Myth Buster:</strong> 
+                        <span class="text-slate-300 text-sm">Pringles cans (~75mm) are often too narrow, operating dangerously close to the cutoff frequency. A simple coffee can (~100mm) outperforms them significantly.</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Step 2 -->
-            <div class="relative pl-8 border-l-2 border-slate-700">
-                <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-sky-500"></div>
-                <h4 class="text-xl font-bold text-white mb-2">Step 2: Prepare the Copper Probe</h4>
-                <p class="text-slate-300 mb-4">
-                    You are using a <strong>1.5mm pure copper wire</strong>. This acts as the radiating element.
+            <div class="relative pl-10 md:pl-16 border-l-2 border-slate-800 hover:border-sky-500/50 transition-colors duration-500">
+                <div class="absolute -left-[11px] top-0 w-6 h-6 rounded-full bg-slate-900 border-4 border-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]"></div>
+                <h4 class="text-2xl font-bold text-white mb-4">Step 2: Prepare the Copper Probe</h4>
+                <p class="text-slate-300 mb-6 text-lg">
+                    You are using a <strong>1.5mm pure copper wire</strong>. This acts as the radiating monopole.
                 </p>
-                <ol class="list-decimal ml-5 space-y-2 text-slate-300">
-                    <li>Take your N-type Female Chassis connector.</li>
-                    <li>Straighten a small section of your copper wire coil.</li>
-                    <li>Solder the copper wire into the solder cup of the N-connector pin. Ensure it is perfectly vertical.</li>
-                    <li><strong>Crucial Measurement:</strong> The total length of the probe (from the flat face of the brass connector to the tip of the copper) must be exactly <span class="font-mono text-sky-400">30.7mm</span> (which is $\lambda_0/4$).</li>
-                    <li>Trim the wire carefully. File the tip to be smooth (sharp points can leak corona discharge, though unlikely at wifi power levels, it's bad practice).</li>
-                </ol>
+                <div class="bg-slate-800/50 p-6 rounded-xl border border-white/5 space-y-4">
+                    <div class="flex items-center gap-4">
+                        <span class="bg-sky-500/10 text-sky-400 font-bold px-3 py-1 rounded">1</span>
+                        <span class="text-slate-300">Solder the copper wire vertically into the N-connector pin.</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="bg-sky-500/10 text-sky-400 font-bold px-3 py-1 rounded">2</span>
+                        <span class="text-slate-300">Measure exactly <span class="font-mono text-sky-300 bg-sky-500/10 px-2 rounded mx-1">30.7mm</span> from the brass face.</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="bg-sky-500/10 text-sky-400 font-bold px-3 py-1 rounded">3</span>
+                        <span class="text-slate-300">Trim and file the tip smooth (prevents corona discharge).</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Step 3 -->
-            <div class="relative pl-8 border-l-2 border-slate-700">
-                <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-sky-500"></div>
-                <h4 class="text-xl font-bold text-white mb-2">Step 3: Drilling the Can</h4>
-                <p class="text-slate-300 mb-4">
-                    The location of the hole determines the impedance match.
+            <div class="relative pl-10 md:pl-16 border-l-2 border-slate-800 hover:border-sky-500/50 transition-colors duration-500">
+                <div class="absolute -left-[11px] top-0 w-6 h-6 rounded-full bg-slate-900 border-4 border-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]"></div>
+                <h4 class="text-2xl font-bold text-white mb-4">Step 3: Drilling the Can</h4>
+                <p class="text-slate-300 mb-4 text-lg">
+                    Precision is key. The location of the hole determines the impedance match (VSWR).
                 </p>
-                <ul class="list-disc ml-5 space-y-2 text-slate-300">
-                    <li>Measure from the <strong>inside bottom</strong> of the can. If the can has a lip, measure from the actual metal floor.</li>
-                    <li>Mark the distance calculated as "Probe Position" ($S$).</li>
-                    <li>Drill a hole sized for your N-type connector (usually 5/8" or 16mm, check your specific connector specs).</li>
-                    <li>Sand the area around the hole down to bare metal to ensure a good ground connection with the connector body.</li>
+                <ul class="list-disc ml-5 space-y-3 text-slate-300 marker:text-sky-500">
+                    <li>Measure from the <strong>inside bottom</strong> face of the can.</li>
+                    <li>Mark the distance <strong class="text-white">Probe Position (S)</strong> calculated above.</li>
+                    <li>Drill carefully using a step bit to fit your N-connector (usually 5/8").</li>
+                    <li>Sand off the paint around the hole to ensure grounding.</li>
                 </ul>
             </div>
 
             <!-- Step 4 -->
-            <div class="relative pl-8 border-l-2 border-slate-700">
-                <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-sky-500"></div>
-                <h4 class="text-xl font-bold text-white mb-2">Step 4: Assembly & Cabling</h4>
-                <p class="text-slate-300 mb-4">
-                    Mount the connector with the probe inside. Use screws and nuts to secure the chassis connector to the can.
-                </p>
-                <div class="grid md:grid-cols-2 gap-6 mt-4">
-                    <div class="bg-slate-800 p-4 rounded border border-slate-700">
-                        <h5 class="font-semibold text-white mb-2">LMR-400 Management</h5>
-                        <p class="text-sm text-slate-400">
-                            You have 1m and 1.5m LMR-400 cables. These are <strong>heavy and stiff</strong>. 
-                            Connecting a thick LMR-400 directly to a light tin can will tip it over.
-                            <br><br>
-                            <strong>Solution:</strong> Mount the can to a tripod or a wooden block. Use zip ties to secure the LMR-400 to the mount so the weight doesn't stress the N-connector solder joint.
+            <div class="relative pl-10 md:pl-16 border-l-2 border-slate-800 hover:border-sky-500/50 transition-colors duration-500">
+                <div class="absolute -left-[11px] top-0 w-6 h-6 rounded-full bg-slate-900 border-4 border-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]"></div>
+                <h4 class="text-2xl font-bold text-white mb-4">Step 4: Assembly & Cabling</h4>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h5 class="font-semibold text-white mb-3 flex items-center"><i class="fas fa-weight-hanging text-slate-400 mr-3"></i> LMR-400 Warning</h5>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            LMR-400 is heavy and stiff. It will easily tip over a light coffee can. 
+                            <strong>Do not rely on the connector to hold the weight.</strong> Zip-tie the cable to your tripod or mount.
                         </p>
                     </div>
-                    <div class="bg-slate-800 p-4 rounded border border-slate-700">
-                        <h5 class="font-semibold text-white mb-2">Connection Chain</h5>
-                        <p class="text-sm text-slate-400 font-mono">
-                            WiFi Router (RP-SMA) <br>
-                            ↓ <br>
-                            LMR-400 (RP-SMA to N-Male) <br>
-                            ↓ <br>
-                            Cantenna (N-Female)
-                        </p>
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h5 class="font-semibold text-white mb-3 flex items-center"><i class="fas fa-link text-slate-400 mr-3"></i> Signal Chain</h5>
+                        <div class="flex flex-col gap-2 text-sm text-slate-300 font-mono">
+                            <div class="flex justify-between border-b border-white/5 pb-1"><span>Router</span> <span class="text-slate-500">RP-SMA</span></div>
+                            <div class="flex justify-center text-sky-500 text-xs py-1">↓</div>
+                            <div class="flex justify-between border-b border-white/5 pb-1"><span>Cable</span> <span class="text-slate-500">LMR-400</span></div>
+                            <div class="flex justify-center text-sky-500 text-xs py-1">↓</div>
+                            <div class="flex justify-between"><span>Can</span> <span class="text-slate-500">N-Female</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -363,10 +458,10 @@
     </section>
 
     <!-- Visual Diagram -->
-    <section class="py-12 bg-slate-900 border-t border-slate-800">
+    <section class="py-16 bg-slate-950 border-t border-slate-800">
         <div class="max-w-4xl mx-auto px-4">
-            <h3 class="text-2xl font-bold text-white mb-6 text-center">Visual Reference</h3>
-            <div class="diagram-container flex items-center justify-center bg-slate-950">
+            <h3 class="text-2xl font-bold text-white mb-8 text-center">Visual Reference</h3>
+            <div class="diagram-container flex items-center justify-center">
                 <!-- SVG Diagram -->
                 <svg width="600" height="320" viewBox="0 0 600 320" xmlns="http://www.w3.org/2000/svg">
                     <!-- Can Body -->
@@ -376,6 +471,13 @@
                             <stop offset="50%" style="stop-color:#475569;stop-opacity:1" />
                             <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
                         </linearGradient>
+                        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
                     </defs>
                     
                     <!-- The Can Cylinder -->
@@ -384,28 +486,32 @@
                     <line x1="50" y1="40" x2="50" y2="240" stroke="#cbd5e1" stroke-width="4"/>
                     
                     <!-- The Probe -->
-                    <line x1="150" y1="240" x2="150" y2="160" stroke="#f59e0b" stroke-width="4" stroke-linecap="round"/>
+                    <line x1="150" y1="240" x2="150" y2="160" stroke="#f59e0b" stroke-width="4" stroke-linecap="round" filter="url(#glow)"/>
                     <!-- Connector Base -->
                     <rect x="140" y="240" width="20" height="10" fill="#fbbf24"/>
                     
                     <!-- Dimensions -->
                     <!-- Probe Position S -->
                     <line x1="50" y1="260" x2="150" y2="260" stroke="#38bdf8" stroke-width="2"/>
-                    <text x="85" y="275" fill="#38bdf8" font-family="monospace" font-size="14">S = λg/4</text>
+                    <text x="85" y="275" fill="#38bdf8" font-family="monospace" font-size="14" font-weight="bold">S = λg/4</text>
                     
                     <!-- Probe Length L -->
                     <line x1="170" y1="240" x2="170" y2="160" stroke="#38bdf8" stroke-width="2"/>
-                    <text x="180" y="200" fill="#38bdf8" font-family="monospace" font-size="14">L = λo/4</text>
+                    <text x="180" y="200" fill="#38bdf8" font-family="monospace" font-size="14" font-weight="bold">L = λo/4</text>
 
                     <!-- Total Length -->
                     <line x1="50" y1="295" x2="450" y2="295" stroke="#22c55e" stroke-width="2" stroke-dasharray="4"/>
                     <line x1="50" y1="290" x2="50" y2="300" stroke="#22c55e" stroke-width="2"/>
                     <line x1="450" y1="290" x2="450" y2="300" stroke="#22c55e" stroke-width="2"/>
-                    <text x="190" y="315" fill="#22c55e" font-family="monospace" font-size="14">Min Length ≈ 0.75 λg</text>
+                    <text x="190" y="315" fill="#22c55e" font-family="monospace" font-size="14" font-weight="bold">Min Length ≈ 0.75 λg</text>
                     
                     <!-- Waves representation -->
-                    <path d="M 160 140 Q 220 40 280 140 T 400 140" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="5,5"/>
-                    <path d="M 160 140 Q 220 240 280 140 T 400 140" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-dasharray="5,5"/>
+                    <path d="M 160 140 Q 220 40 280 140 T 400 140" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" stroke-dasharray="5,5">
+                        <animate attributeName="stroke-dashoffset" from="10" to="0" dur="2s" repeatCount="indefinite" />
+                    </path>
+                    <path d="M 160 140 Q 220 240 280 140 T 400 140" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2" stroke-dasharray="5,5">
+                         <animate attributeName="stroke-dashoffset" from="10" to="0" dur="2s" repeatCount="indefinite" />
+                    </path>
 
                     <!-- Labels -->
                     <text x="460" y="140" fill="#94a3b8" font-size="14">Open End</text>
@@ -417,13 +523,16 @@
     </section>
 
     <!-- Footer -->
-    <footer class="py-8 text-center text-slate-500 text-sm bg-slate-900 border-t border-slate-800">
-        <p>Generated for 2.4 GHz Wi-Fi Optimization.</p>
-        <p class="mt-2">Safety Warning: Always wear eye protection when drilling. Be careful with copper wire ends.</p>
+    <footer class="py-10 text-center text-slate-500 text-sm bg-slate-950 border-t border-slate-900">
+        <p class="flex items-center justify-center gap-2 mb-2">
+            <span class="text-sky-500 font-bold">Cantenna Architect</span> &copy; 2024
+        </p>
+        <p class="text-slate-600 flex items-center justify-center gap-2">
+            <i class="fas fa-shield-alt"></i> Always wear eye protection when drilling. Be careful with RF connectors.
+        </p>
     </footer>
 
     <script>
-        // Force the page to start at the top on load/refresh
         if (history.scrollRestoration) {
             history.scrollRestoration = 'manual';
         }
@@ -434,71 +543,98 @@
         function setUnit(unit) {
             currentUnit = unit;
             
-            // Update Button UI
             const btnCm = document.getElementById('btn-cm');
             const btnMm = document.getElementById('btn-mm');
             const input = document.getElementById('canDiameter');
             const helper = document.getElementById('rangeHelper');
+            const unitLabel = document.getElementById('unit-label');
+
+            const baseClasses = "px-4 py-1.5 text-xs font-bold rounded-md transition-all shadow-sm";
+            const activeClasses = "bg-sky-500 text-white shadow-lg shadow-sky-500/30 transform scale-105";
+            const inactiveClasses = "text-slate-400 hover:text-white hover:bg-slate-800";
 
             if (unit === 'cm') {
-                btnCm.className = "px-3 py-1 text-xs font-bold bg-sky-500 text-white transition";
-                btnMm.className = "px-3 py-1 text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition";
+                btnCm.className = `${baseClasses} ${activeClasses}`;
+                btnMm.className = `${baseClasses} ${inactiveClasses}`;
                 input.placeholder = "e.g. 8.5";
-                helper.innerHTML = '<i class="fas fa-info-circle"></i> Ideal: 8.0cm - 9.2cm <span class="mx-1 text-slate-600">|</span> Allowed: 7.21cm - 9.42cm';
+                unitLabel.innerText = "cm";
+                helper.innerHTML = '<i class="fas fa-info-circle text-sky-400 mr-1"></i> Ideal: <span class="text-slate-300">8.0-9.2cm</span> <br> Allowed: <span class="text-slate-300">7.21-9.42cm</span>';
             } else {
-                btnMm.className = "px-3 py-1 text-xs font-bold bg-sky-500 text-white transition";
-                btnCm.className = "px-3 py-1 text-xs font-bold text-slate-400 hover:bg-slate-800 hover:text-white transition";
+                btnMm.className = `${baseClasses} ${activeClasses}`;
+                btnCm.className = `${baseClasses} ${inactiveClasses}`;
                 input.placeholder = "e.g. 85";
-                helper.innerHTML = '<i class="fas fa-info-circle"></i> Ideal: 80mm - 92mm <span class="mx-1 text-slate-600">|</span> Allowed: 72.1mm - 94.2mm';
+                unitLabel.innerText = "mm";
+                helper.innerHTML = '<i class="fas fa-info-circle text-sky-400 mr-1"></i> Ideal: <span class="text-slate-300">80-92mm</span> <br> Allowed: <span class="text-slate-300">72.1-94.2mm</span>';
             }
-            
-            // Note: We no longer trigger calculation automatically here
         }
 
         function resetCalculator() {
-            // Clear Input
             document.getElementById('canDiameter').value = '';
-            
-            // Reset Unit to Default (cm)
             setUnit('cm');
-
-            // Reset Results Panel to Initial State
-            document.getElementById('resultsPanel').innerHTML = `
-                <div class="text-center text-slate-500 h-full flex flex-col justify-center">
-                    <i class="fas fa-arrow-left text-2xl mb-2 md:hidden"></i>
-                    <p>Enter diameter and press Calculate</p>
-                </div>`;
+            
+            // Reset UI cleanly
+            const panel = document.getElementById('resultsPanel');
+            panel.innerHTML = `
+                <div id="initialState" class="text-center text-slate-500 animate-fade-in-up">
+                    <div class="w-20 h-20 bg-slate-800 rounded-full mx-auto mb-6 flex items-center justify-center border border-slate-700">
+                        <i class="fas fa-arrow-left text-3xl opacity-50 hidden lg:block"></i>
+                        <i class="fas fa-arrow-up text-3xl opacity-50 lg:hidden"></i>
+                    </div>
+                    <p class="text-lg font-medium mb-1 text-slate-400">Ready to Design</p>
+                    <p class="text-sm">Enter your can's dimensions to begin.</p>
+                </div>
+                <div id="loaderState" class="hidden absolute inset-0 bg-slate-900/90 z-20 flex-col items-center justify-center">
+                    <div class="w-12 h-12 border-4 border-sky-500/30 border-t-sky-500 rounded-full animate-spin mb-4"></div>
+                    <p class="text-sky-400 font-mono text-sm animate-pulse">Computing Maxwell's Equations...</p>
+                </div>
+            `;
         }
 
-        function calculateDimensions() {
+        function triggerCalculation() {
             const input = document.getElementById('canDiameter');
-            const resultsPanel = document.getElementById('resultsPanel');
             let val = parseFloat(input.value);
 
-            // Validation: Check for empty, NaN, or non-positive numbers
             if (!val || isNaN(val) || val <= 0) {
-                resultsPanel.innerHTML = `
-                    <div class="text-center text-slate-500 h-full flex flex-col justify-center">
-                        <i class="fas fa-arrow-left text-2xl mb-2 md:hidden"></i>
-                        <p>Enter diameter and press Calculate</p>
+                 // Error Shake Effect
+                const panel = document.getElementById('resultsPanel');
+                panel.innerHTML = `
+                    <div class="text-center text-red-400 flex flex-col justify-center items-center h-full animate-fade-in-up">
+                        <div class="bg-red-500/10 p-4 rounded-full mb-4 ring-1 ring-red-500/30">
+                             <i class="fas fa-exclamation text-3xl"></i>
+                        </div>
+                        <p class="font-bold text-xl mb-2">Invalid Input</p>
+                        <p class="text-sm text-slate-400">Please enter a positive number greater than zero.</p>
                     </div>`;
                 return;
             }
 
+            // Show Loader
+            const loader = document.getElementById('loaderState');
+            if(loader) loader.classList.remove('hidden');
+            else {
+                // If button was pressed again after result, manually inject loader structure again or just allow quick recalc. 
+                // For simplicity, let's just use the direct calculation flow if loader is missing (re-renders anyway).
+            }
+
+            // Fake Delay for "Calculation Effect"
+            setTimeout(() => {
+                calculateDimensions(val);
+            }, 600);
+        }
+
+        function calculateDimensions(val) {
+            const resultsPanel = document.getElementById('resultsPanel');
+            
             // Normalize to millimeters for calculation
             let D_mm = currentUnit === 'cm' ? val * 10 : val;
 
-            // Constants for 2.437 GHz (Channel 6 center)
             const f = 2437000000; 
-            const c = 299792458000; // Speed of light in mm/s
-            const lambda_0 = c / f; // Free space wavelength in mm (~123mm)
-
-            // Cutoff Limits
-            const cut_TE11 = lambda_0 / 1.706; // Lower limit (~72.1mm)
-            const cut_TM01 = lambda_0 / 1.306; // Upper limit (~94.2mm)
+            const c = 299792458000; 
+            const lambda_0 = c / f; 
+            const cut_TE11 = lambda_0 / 1.706; 
+            const cut_TM01 = lambda_0 / 1.306; 
 
             // STRICT BOUNDARY CHECK
-            // If out of bounds, STOP and show RED ALERT.
             if (D_mm < cut_TE11 || D_mm > cut_TM01) {
                 let errorTitle = "";
                 let errorMsg = "";
@@ -507,45 +643,41 @@
                 if (D_mm < cut_TE11) {
                     errorTitle = "Diameter Too Small (Cutoff)";
                     errorMsg = "The wave physically cannot fit inside this can. It acts as a high-pass filter blocking the 2.4 GHz signal completely.";
-                    boundaryVal = `Minimum required: ${(cut_TE11 / (currentUnit === 'cm' ? 10 : 1)).toFixed(2)} ${currentUnit}`;
+                    boundaryVal = `Minimum: ${(cut_TE11 / (currentUnit === 'cm' ? 10 : 1)).toFixed(2)} ${currentUnit}`;
                 } else {
                     errorTitle = "Diameter Too Large (Multimode)";
-                    errorMsg = "This diameter allows multiple signal modes (TE11 + TM01) to bounce chaotically, causing destructive interference and signal loss. It is forbidden for a reliable link.";
-                    boundaryVal = `Maximum allowed: ${(cut_TM01 / (currentUnit === 'cm' ? 10 : 1)).toFixed(2)} ${currentUnit}`;
+                    errorMsg = "This diameter allows multiple signal modes to bounce chaotically, causing destructive interference. Forbidden for reliable links.";
+                    boundaryVal = `Maximum: ${(cut_TM01 / (currentUnit === 'cm' ? 10 : 1)).toFixed(2)} ${currentUnit}`;
                 }
 
                 resultsPanel.innerHTML = `
-                    <div class="bg-red-500/10 border-2 border-red-500 rounded-xl p-6 h-full flex flex-col justify-center items-center text-center">
-                        <div class="bg-red-500 text-white rounded-full w-16 h-16 flex items-center justify-center mb-4">
-                            <i class="fas fa-ban text-3xl"></i>
+                    <div class="bg-red-500/5 border border-red-500/30 rounded-2xl p-8 h-full flex flex-col justify-center items-center text-center relative overflow-hidden animate-fade-in-up">
+                        <div class="absolute inset-0 bg-red-500/5 pointer-events-none"></div>
+                        <div class="bg-gradient-to-br from-red-500 to-pink-600 text-white rounded-full w-20 h-20 flex items-center justify-center mb-6 shadow-xl shadow-red-500/20">
+                            <i class="fas fa-ban text-4xl"></i>
                         </div>
-                        <h4 class="text-xl font-bold text-red-400 mb-2 uppercase tracking-wide">Forbidden Dimensions</h4>
-                        <p class="text-white font-semibold text-lg mb-2">${errorTitle}</p>
-                        <p class="text-slate-300 text-sm mb-6 max-w-sm mx-auto">${errorMsg}</p>
-                        <div class="bg-red-900/50 px-4 py-2 rounded border border-red-500/50">
-                            <span class="font-mono text-red-200 font-bold">${boundaryVal}</span>
+                        <h4 class="text-2xl font-bold text-white mb-2 uppercase tracking-wide">Forbidden Dimensions</h4>
+                        <p class="text-red-200 font-medium text-lg mb-4">${errorTitle}</p>
+                        <p class="text-slate-400 text-sm mb-8 max-w-sm mx-auto leading-relaxed">${errorMsg}</p>
+                        <div class="bg-slate-900/80 px-6 py-3 rounded-lg border border-red-500/30 font-mono text-red-200 font-bold shadow-lg">
+                            ${boundaryVal}
                         </div>
                     </div>
                 `;
-                return; // STOP EXECUTION HERE
+                return;
             }
 
-            // --- Only proceed if valid --- 
-
-            // Calculate Guide Wavelength
+            // Valid Calculation
             const ratio = lambda_0 / (1.706 * D_mm);
             const lambda_g = lambda_0 / Math.sqrt(1 - Math.pow(ratio, 2));
             
-            // Store raw mm values
             let gw_mm = lambda_g;
             let pp_mm = lambda_g / 4;
             let ml_mm = lambda_g * 0.75;
             let probeHeight_val = lambda_0 / 4;
 
-            // Variables for display
             let guideWavelengthVal, probePos, minLength, probeHeight;
 
-            // Format based on unit
             if (currentUnit === 'cm') {
                 guideWavelengthVal = (gw_mm / 10).toFixed(2);
                 probePos = (pp_mm / 10).toFixed(2);
@@ -558,46 +690,61 @@
                 probeHeight = probeHeight_val.toFixed(2);
             }
 
-            // Render Success UI
+            // Render Success UI with Staggered Animation
             resultsPanel.innerHTML = `
-                <div class="border-b border-slate-700 pb-4 mb-4">
-                     <div class="text-green-400 font-bold mb-2 flex items-center gap-2">
-                        <i class="fas fa-check-circle text-xl"></i> 
-                        <span class="text-lg">Design Validated</span>
+                <div class="h-full flex flex-col justify-between">
+                    <div class="border-b border-white/10 pb-5 mb-2 relative animate-fade-in-up">
+                         <div class="text-green-400 font-bold mb-2 flex items-center gap-3 text-lg">
+                            <div class="bg-green-500/20 p-1.5 rounded-full ring-1 ring-green-500/40 animate-pulse">
+                                <i class="fas fa-check text-xs"></i>
+                            </div>
+                            <span>Design Validated</span>
+                        </div>
+                        <p class="text-sm text-slate-400 leading-relaxed">Perfect geometry for $TE_{11}$ propagation.</p>
                     </div>
-                    <p class="text-sm text-slate-400">This diameter perfectly supports the dominant mode ($TE_{11}$) while blocking interference ($TM_{01}$).</p>
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div>
-                        <span class="text-slate-500 text-xs uppercase tracking-wide">Probe Position (S)</span>
-                        <div class="text-2xl font-mono text-white">${probePos} <span class="text-sm text-slate-500">${currentUnit}</span></div>
-                        <div class="text-xs text-slate-500">From back wall</div>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 lg:gap-6 relative">
+                        <!-- Card 1 -->
+                        <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 relative group hover:bg-slate-800/80 transition-all animate-fade-in-up delay-100">
+                            <div class="absolute inset-0 bg-sky-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+                            <span class="text-slate-500 text-[10px] md:text-xs uppercase tracking-wider font-bold flex items-center gap-1"><i class="fas fa-ruler-horizontal text-sky-500/50"></i> Probe Position (S)</span>
+                            <div class="text-2xl md:text-3xl font-mono text-white mt-2">${probePos} <span class="text-sm text-slate-500 font-sans">${currentUnit}</span></div>
+                            <div class="text-[10px] md:text-xs text-slate-400 mt-1">From back wall</div>
+                        </div>
+
+                        <!-- Card 2 -->
+                        <div class="bg-slate-800/50 p-4 rounded-xl border border-white/5 relative group hover:bg-slate-800/80 transition-all animate-fade-in-up delay-200">
+                            <div class="absolute inset-0 bg-sky-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl"></div>
+                            <span class="text-slate-500 text-[10px] md:text-xs uppercase tracking-wider font-bold flex items-center gap-1"><i class="fas fa-ruler-vertical text-sky-500/50"></i> Probe Height (L)</span>
+                            <div class="text-2xl md:text-3xl font-mono text-white mt-2">${probeHeight} <span class="text-sm text-slate-500 font-sans">${currentUnit}</span></div>
+                            <div class="text-[10px] md:text-xs text-slate-400 mt-1">Copper wire length</div>
+                        </div>
+
+                        <!-- Card 3 -->
+                        <div class="bg-green-500/5 p-4 rounded-xl border border-green-500/20 relative group hover:bg-green-500/10 transition-all animate-fade-in-up delay-300">
+                            <span class="text-green-400 text-[10px] md:text-xs uppercase tracking-wider font-bold flex items-center gap-1"><i class="fas fa-arrow-right-to-bracket opacity-50"></i> Min. Can Length</span>
+                            <div class="text-2xl md:text-3xl font-mono text-green-400 mt-2">${minLength} <span class="text-sm text-green-500/70 font-sans">${currentUnit}</span></div>
+                            <div class="text-[10px] md:text-xs text-green-500/70 mt-1">Total tube length</div>
+                        </div>
                     </div>
-                    <div>
-                        <span class="text-slate-500 text-xs uppercase tracking-wide">Probe Height (L)</span>
-                        <div class="text-2xl font-mono text-white">${probeHeight} <span class="text-sm text-slate-500">${currentUnit}</span></div>
-                        <div class="text-xs text-slate-500">Total copper length</div>
-                    </div>
-                    <div>
-                        <span class="text-slate-500 text-xs uppercase tracking-wide">Min. Can Length</span>
-                        <div class="text-2xl font-mono text-green-400">${minLength} <span class="text-sm text-slate-500">${currentUnit}</span></div>
-                        <div class="text-xs text-slate-500">Total tube length</div>
-                    </div>
-                    <div class="col-span-2 md:col-span-3 mt-2 bg-slate-800 p-2 rounded flex justify-between items-center">
-                         <div>
-                             <span class="text-slate-500 text-xs uppercase tracking-wide">Guide Wavelength</span>
-                             <span class="text-slate-400 text-sm ml-1">($\\lambda_g$)</span>
+
+                    <div class="mt-4 bg-slate-950/50 p-3 rounded-lg border border-white/5 flex justify-between items-center animate-fade-in-up delay-400">
+                         <div class="flex items-center">
+                             <span class="text-slate-500 text-xs uppercase tracking-wide font-bold">Guide Wavelength</span>
+                             <span class="text-slate-400 text-xs ml-2 bg-slate-800 px-1.5 py-0.5 rounded">$\\lambda_g$</span>
                          </div>
-                         <div class="text-lg font-mono text-sky-400">${guideWavelengthVal} <span class="text-sm text-slate-500">${currentUnit}</span></div>
+                         <div class="text-xl font-mono text-sky-400">${guideWavelengthVal} <span class="text-sm text-slate-500 font-sans">${currentUnit}</span></div>
                     </div>
                 </div>
             `;
             
-            // Re-render MathJax for the dynamic content
             if(window.MathJax && window.MathJax.typesetPromise) {
                 window.MathJax.typesetPromise([resultsPanel]).catch(err => console.log('MathJax error:', err));
             }
         }
+        
+        // Initialize buttons
+        setUnit('cm');
     </script>
 </body>
 </html>
