@@ -164,7 +164,7 @@
         
         <div class="max-w-4xl mx-auto px-4 text-center relative z-10">
             <span class="inline-block py-1 px-3 rounded-full bg-sky-500/10 border border-sky-500/20 text-sky-300 text-xs font-bold tracking-wider mb-6 animate-fade-in-up">
-                V2.0 &bull; INTERACTIVE GUIDE
+                V2.1 &bull; INTERACTIVE GUIDE
             </span>
             <h2 class="text-5xl md:text-6xl font-bold text-white mb-6 tracking-tight animate-fade-in-up delay-100">
                 Designing the <br>
@@ -541,11 +541,37 @@
         let currentUnit = 'cm';
 
         function setUnit(unit) {
+            const input = document.getElementById('canDiameter');
+            
+            // Conversion Logic
+            // Only convert if changing units and value exists
+            if (currentUnit !== unit && input.value !== "") {
+                let val = parseFloat(input.value);
+                if (!isNaN(val)) {
+                    if (unit === 'mm') {
+                        // Switching cm -> mm
+                        val = val * 10;
+                    } else {
+                        // Switching mm -> cm
+                        val = val / 10;
+                    }
+                    // Avoid floating point errors (e.g. 8.5 * 10 = 85.000001)
+                    val = parseFloat(val.toFixed(2));
+                    input.value = val;
+                    
+                    // Update global before triggering calculation
+                    currentUnit = unit;
+                    
+                    // Instant Recalculation (skips the fake loader delay for unit switches)
+                    if (val > 0) calculateDimensions(val);
+                }
+            }
+            
             currentUnit = unit;
             
+            // UI Updates
             const btnCm = document.getElementById('btn-cm');
             const btnMm = document.getElementById('btn-mm');
-            const input = document.getElementById('canDiameter');
             const helper = document.getElementById('rangeHelper');
             const unitLabel = document.getElementById('unit-label');
 
@@ -570,6 +596,8 @@
 
         function resetCalculator() {
             document.getElementById('canDiameter').value = '';
+            // Reset to cm but don't try to convert empty value
+            currentUnit = 'mm'; // trick it so setUnit('cm') runs the UI update logic fully
             setUnit('cm');
             
             // Reset UI cleanly
@@ -611,12 +639,8 @@
             // Show Loader
             const loader = document.getElementById('loaderState');
             if(loader) loader.classList.remove('hidden');
-            else {
-                // If button was pressed again after result, manually inject loader structure again or just allow quick recalc. 
-                // For simplicity, let's just use the direct calculation flow if loader is missing (re-renders anyway).
-            }
 
-            // Fake Delay for "Calculation Effect"
+            // Fake Delay for "Calculation Effect" - Only on manual button press
             setTimeout(() => {
                 calculateDimensions(val);
             }, 600);
@@ -744,6 +768,7 @@
         }
         
         // Initialize buttons
+        // Set unit to cm but don't call setUnit directly to avoid null pointer on empty input check at start
         setUnit('cm');
     </script>
 </body>
