@@ -8,6 +8,17 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script>
+        // --- CRITICAL SCROLL FIX ---
+        // This block runs immediately to prevent jumpiness
+        if (history.scrollRestoration) {
+            history.scrollRestoration = 'manual';
+        }
+        
+        // Reset scroll on unload so browser doesn't save position
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        };
+
         window.MathJax = {
             tex: {
                 inlineMath: [['$', '$'], ['\\(', '\\)']],
@@ -576,10 +587,34 @@
     </footer>
 
     <script>
-        if (history.scrollRestoration) {
-            history.scrollRestoration = 'manual';
-        }
-        window.scrollTo(0, 0);
+        // --- CRITICAL SCROLL FIX ---
+        document.addEventListener("DOMContentLoaded", function() {
+            // Manual scroll restoration to prevent browser jumpiness
+            if (history.scrollRestoration) {
+                history.scrollRestoration = 'manual';
+            }
+            
+            // Clear any hash from the URL to prevent jumping to sections like #construction
+            if (window.location.hash) {
+                history.replaceState(null, null, window.location.pathname);
+            }
+
+            // Immediate scroll to top
+            window.scrollTo(0, 0);
+            
+            // Delayed scroll to top to fight mobile browser's layout shifts
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 10);
+            setTimeout(function() {
+                window.scrollTo(0, 0);
+            }, 100);
+        });
+
+        // Reset scroll on unload so browser doesn't save position for next time
+        window.onbeforeunload = function () {
+            window.scrollTo(0, 0);
+        };
 
         let currentUnit = 'cm';
 
@@ -816,5 +851,3 @@
     </script>
 </body>
 </html>
-
-
